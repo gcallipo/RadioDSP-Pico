@@ -3,5 +3,8 @@ This Is a Digital Signal Processing to computer the audio  of Radio receiver. Th
 
 NOTE: The project was build with Arduino IDE v. 1.8.18 with the Arduino MBED OS RP2040 v.3.3.0 installed.
 
+Video of SSB test:  https://www.youtube.com/watch?v=feivPPi68Uc
+Video of CW  test:  https://www.youtube.com/watch?v=AmVc0JDxThY
+
 November 2022 - Giuseppe Callipo IK8YFW
 
