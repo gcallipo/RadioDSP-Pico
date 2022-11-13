@@ -1,49 +1,41 @@
-
-/*
- * SimpleAudioFilter.ino
- * 
- * Created: Nov 2022
- * Author: Giuseppe Callipo - IK8YFW
- * https://github.com/ik8yfw
- * 
- * 
-*/
 #include "SSB2Filter.h"
 
 static int filter_taps[SSB2FILTER_TAP_NUM] = {
-  3,
-  5,
-  3,
-  -3,
-  -7,
-  -3,
+  -1,
+  -2,
+  -1,
   2,
-  0,
-  -6,
-  -5,
   3,
-  5,
-  -6,
-  -14,
-  4,
-  39,
-  58,
-  39,
-  4,
-  -14,
-  -6,
-  5,
-  3,
-  -5,
-  -6,
-  0,
   2,
+  -1,
   -3,
-  -7,
-  -3,
+  -1,
   3,
   5,
-  3
+  2,
+  -5,
+  -9,
+  -2,
+  17,
+  36,
+  45,
+  36,
+  17,
+  -2,
+  -9,
+  -5,
+  2,
+  5,
+  3,
+  -1,
+  -3,
+  -1,
+  2,
+  3,
+  2,
+  -1,
+  -2,
+  -1
 };
 
 void SSB2Filter_init(SSB2Filter* f) {

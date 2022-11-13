@@ -1,28 +1,38 @@
-/*
- * SimpleAudioFilter.ino
+/************************************************************* 
+ *  SimpleAudioFilter.ino
+ * Audio Filter DSP for Shorthwave Receiver
+ * Functions:
+ * 1. Audio passthrough 
+ * 2. SSB filter 3000 kHz + DNR low level
+ * 3. CW  filter 800  Hz
+ * 4. DNR High level
+ * 
  * 
  * Created: Nov 2022
  * Author: Giuseppe Callipo - IK8YFW
  * https://github.com/ik8yfw
  * 
+ * License: Creative Common with attribution 
  * 
-*/
+ * This program use filters built with the tFilter program
+ * http://t-filter.engineerjs.com/
+ */
 
 #include "Arduino.h"
 #include "audioIO.h"
 
 #include "SSB2Filter.h"
 #include "CW1Filter.h"
+#include "AVGFilter.h"
 
 #include "hardware/adc.h"
 #include "hardware/dma.h"
 #include "pico/multicore.h"
 
-
 #define FSAMP 480000UL       // freq AD sample  = 480kHz
-#define FSAMP_AUDIO 32000U   // audio freq sample   32kHz
+#define FSAMP_AUDIO 48000U   // audio freq sample   48kHz
 #define ADC_CLOCK_DIV ((uint16_t)(48000000UL/FSAMP))  //48Mhz / 480Khz = 100 
-#define BLOCK_NSAMP    (FSAMP/FSAMP_AUDIO)            //block = 480k / 32k = 15 samples
+#define BLOCK_NSAMP    (FSAMP/FSAMP_AUDIO)            //block = 480k / 48k = 10 samples
 #define NSAMP BLOCK_NSAMP
 
 // PWN for dac on pin 15
@@ -35,6 +45,9 @@
 #define PIN_BUTTON 14
 #define LED_PIN 25
 
+// define the maximum safe signal in input
+#define OVER_RANGE 75 
+
 // globals
 dma_channel_config cfg;
 uint               dma_chan;
@@ -43,63 +56,90 @@ volatile uint16_t  dac_audio;
 void sample(uint8_t *capture_buf);
 volatile uint8_t     decimator_ct=0;
 volatile uint8_t     decimator_factor=1;
+volatile int16_t     avg, sum, out_sample =0;
 
-SSB2Filter    flt;
-CW1Filter     flt1;
-uint8_t filterMode =1;
+SSB2Filter    flt;   // SSB filter
+CW1Filter     flt1;  // CW  filter
+AVGFilter     flt2;  // AVG  filter
+
+uint8_t filterMode =0;
 
  // continuous loop running for audio processing
 void audioIO_loop(void)
 { 
-    int16_t out_sample =0;
+    avg = 0;
+    sum = 0;
     uint8_t cap_buf[NSAMP];
 
     // get NSAMP samples at FSAMP
     sample(cap_buf);
 
-    // Check decimator filter:
-    // 0: as passthrough
-    // 1: for SSB
-    // 2: for CW
-    decimator_factor=(filterMode==0)?1:2;
 
-/*** AUDIO PROCESSING WITH FILTERING AND DECIMATIN BLOCK ***/
+    // Check decimator for filtermode:
+    // 0: as passthrough - no decimation
+    // 1: for SSB        - decimate by factor 2
+    // 2: for CW         - decimate by factor 4
+    // 3: DNR            - noise reduction AVERANGE NR
+    
+    decimator_factor = 1;
+    if (filterMode==1){
+      decimator_factor = 2;  
+    }else
+    if (filterMode==2){
+      decimator_factor = 4;  
+    } 
+   
+    // averages input values 
+    for (int i=0;i<NSAMP;i++) {
+        sum+=((int16_t)cap_buf[i]-(DAC_BIAS>>AVG_BIAS_SHIFT));
+    }
+    avg = ((int16_t)sum/(NSAMP));
 
-    decimator_ct ++;
+    /* Blink the builtin LED if the input signal go over range */   
+    if (avg>OVER_RANGE){
+       gpio_put(LED_BUILTIN, 1);
+    }else{
+      gpio_put(LED_BUILTIN, 0);
+    }
+      
+    /*** AUDIO PROCESSING WITH FILTERING AND DECIMATIN BLOCK ***/
+    decimator_ct ++;  
     if ( decimator_ct >= decimator_factor ){
           decimator_ct = 0;
-
-     
-         int16_t sum=0;
-         for (int i=0;i<NSAMP;i++) {
-              sum+=((int16_t)cap_buf[i]-(DAC_BIAS>>AVG_BIAS_SHIFT));
-         }
-         int16_t avg = ((int16_t)sum/(NSAMP));
-
-         //passthrough - no decimation
-         if (filterMode == 0){ 
-             out_sample = (avg+(DAC_BIAS>>AVG_BIAS_SHIFT));
-         }
-         //SSB - decimate : 2
-         else if (filterMode == 1){
-             SSB2Filter_put(&flt, (avg+(DAC_BIAS>>AVG_BIAS_SHIFT))*2);
-             out_sample = SSB2Filter_get(&flt); 
-         }
-         //SSB - decimate : 2
-         else if (filterMode == 2){
-             CW1Filter_put(&flt1, (avg+(DAC_BIAS>>AVG_BIAS_SHIFT))*3);
-             out_sample = CW1Filter_get(&flt1);
+    
+         //passthrough - no decimation (fs=48 ksps)
+         if (filterMode == 0 || filterMode == 3){ 
+             out_sample = avg;
          }
          
-         // Clip to DAC range
-         if (out_sample > (int16_t)DAC_RANGE)            
-              out_sample = DAC_RANGE;
-         else if (out_sample<0)
+         //SSB - decimate : 2 (fs=24 ksps)
+         else if (filterMode == 1){
+             SSB2Filter_put(&flt, avg);
+             out_sample = SSB2Filter_get(&flt)*2;
+         }
+
+         //CW - decimate : 4 (fs=12 ksps)
+         else if (filterMode == 2){
+             CW1Filter_put(&flt1, avg);
+             out_sample = CW1Filter_get(&flt1)*2;
+         }   
+    
+         //add the bias before exit
+         out_sample = out_sample+(DAC_BIAS>>AVG_BIAS_SHIFT);
+        
+     }
+
+   AVGFilter_put(&flt2, out_sample);
+   out_sample = AVGFilter_get(&flt2);
+
+   // Clip to DAC range
+   if (out_sample >= (int16_t)DAC_RANGE)            
+              out_sample = DAC_RANGE-1;
+   else if (out_sample<0)
               out_sample = 0;
 
-         // Send values to PWM for output audio
-         pwm_set_gpio_level(OUT_DAC_PIN, out_sample);
-  }
+   // Send values to PWM for output audio
+   pwm_set_gpio_level(OUT_DAC_PIN, out_sample);
 
 }
 
@@ -115,10 +155,10 @@ void sample(uint8_t *capture_buf) {
       true            // start immediately
       );
 
-  gpio_put(LED_BUILTIN, 1);
+  //gpio_put(LED_BUILTIN, 1);
   adc_run(true);
   dma_channel_wait_for_finish_blocking(dma_chan);
-  gpio_put(LED_BUILTIN, 0);
+  //gpio_put(LED_BUILTIN, 0);
 }
 
 // check commands on core 1
@@ -128,11 +168,23 @@ void core1_commands_check() {
   while(1) {
 
     if (digitalRead(PIN_BUTTON) == LOW) {
-      if (filterMode==2) filterMode=0;
-      else filterMode++;
+      
+      if (filterMode==3) 
+          filterMode=0;
+      else 
+          filterMode++;
+
+      if (filterMode==3)
+          AVGFilter_init(&flt2, 24);
+      if (filterMode==2)
+          AVGFilter_init(&flt2, 1);
+      if (filterMode==1)
+          AVGFilter_init(&flt2, 4);        
+      if (filterMode==0)
+          AVGFilter_init(&flt2, 1);     
     }
 
-    sleep_ms(500);
+    sleep_ms(300);
   }
 }
 
@@ -142,9 +194,11 @@ void audioIO_setup() {
 
   SSB2Filter_init(&flt);
   CW1Filter_init(&flt1);
+  AVGFilter_init(&flt2, 2);
 
   gpio_init_mask(1<<LED_BUILTIN);  
   gpio_set_dir(LED_BUILTIN, GPIO_OUT); 
+  gpio_put(LED_BUILTIN, 0);
 
   adc_gpio_init(26 + CAPTURE_CHANNEL);
 
@@ -159,7 +213,6 @@ void audioIO_setup() {
      );
 
   // set sample rate
-  //adc_set_clkdiv(0);
   adc_set_clkdiv(ADC_CLOCK_DIV);
 
   sleep_ms(1000);
@@ -194,6 +247,3 @@ void audioIO_setup() {
   sleep_ms(1400);
 
 }
-
-
- 

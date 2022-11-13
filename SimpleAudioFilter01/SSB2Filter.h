@@ -1,13 +1,3 @@
-
-/*
- * SimpleAudioFilter.ino
- * 
- * Created: Nov 2022
- * Author: Giuseppe Callipo - IK8YFW
- * https://github.com/ik8yfw
- * 
- * 
-*/
 #ifndef SSB2FILTER_H_
 #define SSB2FILTER_H_
 
@@ -16,23 +6,23 @@
 FIR filter designed with
  http://t-filter.appspot.com
 
-sampling frequency: 16000 Hz
+sampling frequency: 24000 Hz
 
 fixed point precision: 8 bits
 
-* 0 Hz - 3500 Hz
+* 0 Hz - 3800 Hz
   gain = 1
-  desired ripple = 5 dB
+  desired ripple = 2 dB
   actual ripple = n/a
 
-* 4000 Hz - 8000 Hz
+* 4800 Hz - 12000 Hz
   gain = 0
   desired attenuation = -40 dB
   actual attenuation = n/a
 
 */
 
-#define SSB2FILTER_TAP_NUM 33
+#define SSB2FILTER_TAP_NUM 35
 
 typedef struct {
   int history[SSB2FILTER_TAP_NUM];

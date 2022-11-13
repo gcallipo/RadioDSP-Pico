@@ -1,13 +1,3 @@
-
-/*
- * SimpleAudioFilter.ino
- * 
- * Created: Nov 2022
- * Author: Giuseppe Callipo - IK8YFW
- * https://github.com/ik8yfw
- * 
- * 
-*/
 #ifndef CW1FILTER_H_
 #define CW1FILTER_H_
 
@@ -16,28 +6,28 @@
 FIR filter designed with
  http://t-filter.appspot.com
 
-sampling frequency: 16000 Hz
+sampling frequency: 12000 Hz
 
 fixed point precision: 8 bits
 
-* 0 Hz - 200 Hz
-  gain = 0
-  desired attenuation = -40 dB
-  actual attenuation = n/a
-
-* 500 Hz - 1200 Hz
-  gain = 4
+* 0 Hz - 400 Hz
+  gain = 0.8
   desired ripple = 5 dB
   actual ripple = n/a
 
-* 1500 Hz - 8000 Hz
+* 600 Hz - 1600 Hz
+  gain = 2
+  desired ripple = 5 dB
+  actual ripple = n/a
+
+* 2200 Hz - 6000 Hz
   gain = 0
   desired attenuation = -40 dB
   actual attenuation = n/a
 
 */
 
-#define CW1FILTER_TAP_NUM 81
+#define CW1FILTER_TAP_NUM 33
 
 typedef struct {
   int history[CW1FILTER_TAP_NUM];

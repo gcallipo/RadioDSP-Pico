@@ -17,28 +17,22 @@
  * This program use filters built with the tFilter program
  * http://t-filter.engineerjs.com/
  */
+#ifndef AVGFILTER_H_
+#define AVGFILTER_H_
 
-#ifndef __AUDIOIO_H__
-#define __AUDIOIO_H__
+/* AVERAGE FILTER for SIMPLE DNR
+*/
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#define AVGFILTER_TAP_NUM 24
 
-#define AVG_BIAS_SHIFT 1u
-#define DAC_RANGE  256u
-#define DAC_BIAS  (DAC_RANGE/2u)
-#define ADC_RANGE  256u
-#define ADC_BIAS  (ADC_RANGE/2u)
+typedef struct {
+  int history[AVGFILTER_TAP_NUM];
+  unsigned int last_index;
+  unsigned int FilterDepth;
+} AVGFilter;
 
-#define AVG_BIAS_SHIFT  1//8  //16 
+void AVGFilter_init(AVGFilter* f, int depth);
+void AVGFilter_put(AVGFilter* f, int input);
+int  AVGFilter_get(AVGFilter* f);
 
-void audioIO_setup(void);
-void audioIO_loop(void);
-
-
-
-#ifdef __cplusplus
-}
-#endif
 #endif
