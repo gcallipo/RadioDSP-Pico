@@ -77,15 +77,16 @@ void audioIO_loop(void)
 
     // Check decimator for filtermode:
     // 0: as passthrough - no decimation
-    // 1: for SSB        - decimate by factor 2
-    // 2: for CW         - decimate by factor 4
-    // 3: DNR            - noise reduction AVERANGE NR
+    // 1: DNR            - noise reduction AVERANGE NR
+    // 2: for SSB        - decimate by factor 2
+    // 3: for CW         - decimate by factor 4
+   
     
     decimator_factor = 1;
-    if (filterMode==1){
+    if (filterMode==2){
       decimator_factor = 2;  
     }else
-    if (filterMode==2){
+    if (filterMode==3){
       decimator_factor = 4;  
     } 
    
@@ -108,18 +109,18 @@ void audioIO_loop(void)
           decimator_ct = 0;
     
          //passthrough - no decimation (fs=48 ksps)
-         if (filterMode == 0 || filterMode == 3){ 
+         if (filterMode == 0 || filterMode == 1){ 
              out_sample = avg;
          }
          
          //SSB - decimate : 2 (fs=24 ksps)
-         else if (filterMode == 1){
+         else if (filterMode == 2){
              SSB2Filter_put(&flt, avg);
              out_sample = SSB2Filter_get(&flt)*2;
          }
 
          //CW - decimate : 4 (fs=12 ksps)
-         else if (filterMode == 2){
+         else if (filterMode == 3){
              CW1Filter_put(&flt1, avg);
              out_sample = CW1Filter_get(&flt1)*2;
          }   
@@ -174,11 +175,11 @@ void core1_commands_check() {
       else 
           filterMode++;
 
-      if (filterMode==3)
-          AVGFilter_init(&flt2, 24);
-      if (filterMode==2)
-          AVGFilter_init(&flt2, 1);
       if (filterMode==1)
+          AVGFilter_init(&flt2, 24);
+      if (filterMode==3)
+          AVGFilter_init(&flt2, 4);
+      if (filterMode==2)
           AVGFilter_init(&flt2, 4);        
       if (filterMode==0)
           AVGFilter_init(&flt2, 1);     
