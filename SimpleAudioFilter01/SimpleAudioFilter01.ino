@@ -2,10 +2,11 @@
  *  SimpleAudioFilter.ino
  * Audio Filter DSP for Shorthwave Receiver
  * Functions:
- * 1. Audio passthrough 
- * 2. SSB filter 3000 kHz + DNR low level
- * 3. CW  filter 800  Hz
- * 4. DNR High level
+ * 0. Audio passthrough 
+ * 1. DNR High level
+ * 2. AM/SSB filter 6000 kHz + DNR low level
+ * 3. SSB filter    3000 kHz + DNR medium level
+ * 4. CW  filter    700  Hz  + DNR low level
  * 
  * 
  * Created: Nov 2022
@@ -16,6 +17,8 @@
  * 
  * This program use filters built with the tFilter program
  * http://t-filter.engineerjs.com/
+ * 
+ *  Last update: 08/12/2022
  */
 
 #include "audioIO.h"

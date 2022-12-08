@@ -2,10 +2,12 @@
  *  SimpleAudioFilter.ino
  * Audio Filter DSP for Shorthwave Receiver
  * Functions:
- * 1. Audio passthrough 
- * 2. SSB filter 3000 kHz + DNR low level
- * 3. CW  filter 800  Hz
- * 4. DNR High level
+ * 0. Audio passthrough 
+ * 1. DNR High level
+ * 2. AM/SSB filter 6000 kHz + DNR low level
+ * 3. SSB filter    3000 kHz + DNR medium level
+ * 4. CW  filter    700  Hz  + DNR low level
+ * 
  * 
  * 
  * Created: Nov 2022
@@ -16,11 +18,14 @@
  * 
  * This program use filters built with the tFilter program
  * http://t-filter.engineerjs.com/
+ * 
+ * Last update: 08/12/2022
  */
 
 #include "Arduino.h"
 #include "audioIO.h"
 
+#include "SSB1Filter.h"
 #include "SSB2Filter.h"
 #include "CW1Filter.h"
 #include "AVGFilter.h"
@@ -58,9 +63,10 @@ volatile uint8_t     decimator_ct=0;
 volatile uint8_t     decimator_factor=1;
 volatile int16_t     avg, sum, out_sample =0;
 
-SSB2Filter    flt;   // SSB filter
-CW1Filter     flt1;  // CW  filter
-AVGFilter     flt2;  // AVG  filter
+SSB1Filter    flt0;   // AM/SSB filter
+SSB2Filter    flt;    // SSB filter
+CW1Filter     flt1;   // CW  filter
+AVGFilter     flt2;   // AVG  filter
 
 uint8_t filterMode =0;
 
@@ -78,7 +84,7 @@ void audioIO_loop(void)
     // Check decimator for filtermode:
     // 0: as passthrough - no decimation
     // 1: DNR            - noise reduction AVERANGE NR
-    // 2: for SSB        - decimate by factor 2
+    // 2: for AM & SSB   - decimate by factor 2
     // 3: for CW         - decimate by factor 4
    
     
@@ -87,6 +93,9 @@ void audioIO_loop(void)
       decimator_factor = 2;  
     }else
     if (filterMode==3){
+      decimator_factor = 2;  
+    }
+    if (filterMode==4){
       decimator_factor = 4;  
     } 
    
@@ -113,14 +122,18 @@ void audioIO_loop(void)
              out_sample = avg;
          }
          
-         //SSB - decimate : 2 (fs=24 ksps)
+         //AM/SSB - decimate : 2 (fs=24 ksps)
          else if (filterMode == 2){
              SSB2Filter_put(&flt, avg);
              out_sample = SSB2Filter_get(&flt)*2;
          }
-
-         //CW - decimate : 4 (fs=12 ksps)
+         //SSB - decimate : 2 (fs=24 ksps)
          else if (filterMode == 3){
+             SSB1Filter_put(&flt0, avg);
+             out_sample = SSB1Filter_get(&flt0)*2;
+         }
+         //CW - decimate : 4 (fs=12 ksps)
+         else if (filterMode == 4){
              CW1Filter_put(&flt1, avg);
              out_sample = CW1Filter_get(&flt1)*2;
          }   
@@ -170,17 +183,19 @@ void core1_commands_check() {
 
     if (digitalRead(PIN_BUTTON) == LOW) {
       
-      if (filterMode==3) 
+      if (filterMode==4) 
           filterMode=0;
       else 
           filterMode++;
 
       if (filterMode==1)
           AVGFilter_init(&flt2, 24);
+      if (filterMode==4)
+          AVGFilter_init(&flt2, 4);    
       if (filterMode==3)
-          AVGFilter_init(&flt2, 4);
+          AVGFilter_init(&flt2, 6);
       if (filterMode==2)
-          AVGFilter_init(&flt2, 4);        
+          AVGFilter_init(&flt2, 3);        
       if (filterMode==0)
           AVGFilter_init(&flt2, 1);     
     }
@@ -193,6 +208,7 @@ void core1_commands_check() {
 // general setup
 void audioIO_setup() {
 
+  SSB1Filter_init(&flt0);
   SSB2Filter_init(&flt);
   CW1Filter_init(&flt1);
   AVGFilter_init(&flt2, 2);
