@@ -9,12 +9,12 @@ please use the last version (SimpleAudioFilter02) :
 [02.01.2023]
  New Version: SimpleAudioFilter02 use the full 12 bit ADC and PWM output
  Functions:
- 0. Audio passthrough 
- 1. DNR Average High level denoise 
- 2. DNR + DNF Average Denoise + LMS Filter (NB & Beat eliminator)
- 3. AM/SSB filter 6000 kHz + DNR low level
- 4. SSB filter    3000 kHz + DNR medium level
- 5. CW  filter    700  Hz  + DNR low level
+ 1. Audio passthrough 
+ 2. DNR Average High level denoise 
+ 3. DNR + DNF Average Denoise + LMS Filter (NB & Beat eliminator)
+ 4. AM/SSB filter 6000 kHz + DNR low level
+ 5. SSB filter    3000 kHz + DNR medium level
+ 6. CW  filter    700  Hz  + DNR low level
 
 
 [08.12.2022] 
