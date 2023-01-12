@@ -33,6 +33,10 @@ void setup() {
 #ifdef DEBUG_SERIAL 
   Serial.begin(115200);
 #endif  
+
+  // Keep SMPS PWM mode to reduce audio noise. (RPi Pico Dataseet p.18)
+  pinMode(23, OUTPUT);
+  digitalWrite(23, HIGH);
   
   // initialize digital pin LED_BUILTIN as an output.
   gpio_init_mask(1<<LED_BUILTIN);  
