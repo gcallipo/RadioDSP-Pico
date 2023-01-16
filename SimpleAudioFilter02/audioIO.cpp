@@ -38,6 +38,8 @@
 #include "hardware/dma.h"
 #include "pico/multicore.h"
 
+#include "hardware/pwm.h"
+
 #define FSAMP 480000UL       // freq AD sample  = 480kHz
 #define FSAMP_AUDIO 48000U   // audio freq sample   48kHz
 #define ADC_CLOCK_DIV ((uint16_t)(48000000UL/FSAMP))  //48Mhz / 480Khz = 100 
