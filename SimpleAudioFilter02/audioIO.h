@@ -29,8 +29,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-// #define DEBUG_SERIAL
+ 
+//#define DEBUG_SERIAL
 
 #define AVG_BIAS_SHIFT 1u
 #define DAC_RANGE  256u

@@ -38,12 +38,14 @@
 #include "hardware/dma.h"
 #include "pico/multicore.h"
 
-#include "hardware/pwm.h"
+#ifdef NO_MBED
+   #include "hardware/pwm.h"
+#endif
 
 #define FSAMP 480000UL       // freq AD sample  = 480kHz
-#define FSAMP_AUDIO 48000U   // audio freq sample   48kHz
+#define FSAMP_AUDIO 24000U   // audio freq sample    24 kHz //48kHz
 #define ADC_CLOCK_DIV ((uint16_t)(48000000UL/FSAMP))  //48Mhz / 480Khz = 100 
-#define BLOCK_NSAMP    (FSAMP/FSAMP_AUDIO)            //block = 480k / 48k = 10 samples
+#define BLOCK_NSAMP  3//  (FSAMP/FSAMP_AUDIO)            //block = 480k / 24k = 20 samples
 #define NSAMP BLOCK_NSAMP
 
 // PWN for dac on pin 15
@@ -91,6 +93,12 @@ void audioIO_loop(void)
     // get NSAMP samples at FSAMP
     sample(cap_buf);
 
+  // For debug only
+#ifdef DEBUG_SERIAL  
+  int  nn= micros();
+#endif  
+  
+
     // Check decimator for filtermode:
     // 0: as passthrough - no decimation
     // 1,2: DNR + DNF    - noise reduction AVERANGE NR + LMS
@@ -99,13 +107,13 @@ void audioIO_loop(void)
     // 4: for CW         - decimate by factor 4
        
     decimator_factor = 1;
-    if (filterMode==0 || filterMode==1 || filterMode==2 || filterMode==3 || filterMode==4 ) {
+    if (filterMode==0 || filterMode==1 || filterMode==2  || filterMode==3 ) {
       decimator_factor = 1;  
     }
-//    else
-//    if (filterMode==4){
-//      decimator_factor = 2;  
-//    }
+    else
+    if (filterMode==4 ){
+     decimator_factor = 2;  
+    }
     if (filterMode==5){
       decimator_factor = 4;  
     } 
@@ -183,7 +191,7 @@ void audioIO_loop(void)
 
          }
          
-         //SSB - decimate : 1 (fs=48 ksps)
+         //SSB - decimate : 2 (fs=12 ksps)
          else if (filterMode == 4){
 
              AVGFilter_put(&flt2, avg);
@@ -199,7 +207,7 @@ void audioIO_loop(void)
              out_sample = out_sample/16;
          }
          
-         //CW - decimate : 4 (fs=12 ksps)
+         //CW - decimate : 4 (fs=6 ksps)
          else if (filterMode == 5){
            
              CW1Filter_put(&flt1, avg);
@@ -212,10 +220,10 @@ void audioIO_loop(void)
              out_sample = out_sample/16;
 
              #ifdef DEBUG_SERIAL 
-              char buffer[40];
-              sprintf(buffer, "Value %d ", out_sample);
-              //sprintf(buffer, "Value adc  %d ", avg);
-              Serial.println(buffer);
+             // char buffer[40];
+             // sprintf(buffer, "Value %d ", out_sample);
+             // sprintf(buffer, "Value adc  %d ", avg);
+             // Serial.println(buffer);
             #endif   
 
          }
@@ -240,6 +248,15 @@ void audioIO_loop(void)
               out_sample = DAC_RANGE-1;
    else if (out_sample<0)
               out_sample = 0;
+
+// For debug only
+#ifdef DEBUG_SERIAL 
+   int lap = micros()-nn; 
+
+   char buffer[40];
+   sprintf(buffer, "Lap  %d ", lap);
+   Serial.println(buffer);
+#endif                  
 
    // Send values to PWM for output audio
    pwm_set_gpio_level(OUT_DAC_PIN, out_sample);

@@ -6,7 +6,7 @@
 FIR filter designed with
  http://t-filter.appspot.com
 
-sampling frequency: 48000 Hz
+sampling frequency: 24000 Hz
 
 fixed point precision: 12 bits
 
@@ -15,14 +15,14 @@ fixed point precision: 12 bits
   desired ripple = 5 dB
   actual ripple = n/a
 
-* 7000 Hz - 24000 Hz
+* 8000 Hz - 12000 Hz
   gain = 0
   desired attenuation = -40 dB
   actual attenuation = n/a
 
 */
 
-#define SSB2FILTER_TAP_NUM 51
+#define SSB2FILTER_TAP_NUM 16
 
 typedef struct {
   int history[SSB2FILTER_TAP_NUM];

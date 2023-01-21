@@ -6,28 +6,28 @@
 FIR filter designed with
  http://t-filter.appspot.com
 
-sampling frequency: 12000 Hz
+sampling frequency: 6000 Hz
 
 fixed point precision: 12 bits
 
-* 0 Hz - 600 Hz
+* 0 Hz - 100 Hz
   gain = 0
   desired attenuation = -40 dB
   actual attenuation = n/a
 
-* 1000 Hz - 1800 Hz
+* 200 Hz - 1000 Hz
   gain = 1
-  desired ripple = 2 dB
+  desired ripple = 5 dB
   actual ripple = n/a
 
-* 2200 Hz - 6000 Hz
+* 1100 Hz - 3000 Hz
   gain = 0
   desired attenuation = -40 dB
   actual attenuation = n/a
 
 */
 
-#define CW1FILTER_TAP_NUM 45
+#define CW1FILTER_TAP_NUM 69
 
 typedef struct {
   int history[CW1FILTER_TAP_NUM];
