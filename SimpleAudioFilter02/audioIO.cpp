@@ -82,6 +82,8 @@ int           passInput=0;
 
 uint8_t filterMode =0;     
 
+// Enable the feature to measure the sample rate.
+//#define MeasSampleRate
 
  // continuous loop running for audio processing
 void audioIO_loop(void)
@@ -381,7 +383,28 @@ void audioIO_setup() {
 
   // start controller commands : 
   pinMode(PIN_BUTTON, INPUT_PULLUP);
+
+  #ifdef MeasSampleRate
+    Serial.begin(115200);
+    delay(5000);
     
+    for (int i = 0; i < 6; i++) {
+      filterMode = i;
+      sleep_ms(500);
+      
+      uint32_t start = millis();
+      for (int j = 0; j < 1000000; j++) {
+        audioIO_loop();
+      }
+      uint32_t end = millis();
+      
+      Serial.print("FilterMode: ");
+      Serial.print(i);
+      Serial.print(", ADC reads per second:"); 
+      Serial.println(1000000.0 / ((end - start) * 0.001));
+    }
+  #endif
+  
   // pushbutton to select the filter on core 1
   multicore_launch_core1(core1_commands_check);
   sleep_ms(1400);
