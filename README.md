@@ -3,8 +3,12 @@ Audio Filter DSP for Shorthwave Receiver
 
 This Is a Digital Signal Processing to compute the audio of Shortwave Radio receiver. The project Is based on the Raspberry Pico pi board. The project implements some real time filters, show how to setup a simple real time processing dsp chain using the ADC and the PWM in/out for audio. All the works are in progress. 
 
+NEWS [28.01.2023] - I'm starting new experimental filter (SimpleAudioFilter06) using ADCInput and I2S services by earlephilhower/arduino-pico plugin. All is work in progress, but the firsts results are really good.
+
+****************************************************************************************************
+OLD VERSIONS.  
 There are some version available that implements similar processing but with some structural differences
-please use the last version (SimpleAudioFilter02) :
+:
 
 [02.01.2023]
  New Version: SimpleAudioFilter02 use the full 12 bit ADC and PWM output
