@@ -61,15 +61,11 @@ void onReceiveAudioSamples(){
     
     sample = adcIn.read();
 
-    sample = sample - ADC_BIAS -ADC_BIAS_SHIFT;
+    sample = (sample - ADC_BIAS -ADC_BIAS_SHIFT)*8;
 
      CW1Filter_put(&flt1, sample);
      sample = CW1Filter_get(&flt1);
 
-     sample = sample + ADC_BIAS +ADC_BIAS_SHIFT;
-     
-
-    
     // write the same sample twice, once for left and once for the right channel
     i2s.write(sample);
     i2s.write(sample);
