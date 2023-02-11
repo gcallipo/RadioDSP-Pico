@@ -66,7 +66,7 @@ ADCInput adcIn(26);
 #define LED_PIN 25
 
 // define the maximum safe signal in input
-#define OVER_RANGE 150 
+#define OVER_RANGE 2000 
 
 // globals
 volatile uint8_t     decimator_ct=0;
