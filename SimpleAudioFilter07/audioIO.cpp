@@ -84,7 +84,7 @@ int           passInput=0;
 uint8_t filterMode=0; 
 uint8_t nrMode=0;
 int16_t outSample=0;
-int16_t gainAudio =1;
+int8_t gainAudio =1;
 
 // Check if need to boost the audio 
 // For safe reasons the value will be
