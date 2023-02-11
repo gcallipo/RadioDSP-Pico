@@ -155,34 +155,28 @@ void audioIO_loop(void)
 
          // passthrough - no decimation (fs=16 ksps)
          if (filterMode == 0 && decimator_factor==1){ 
-              outSample = newSample + ADC_BIAS +ADC_BIAS_SHIFT; 
+              outSample = newSample; 
          }
 
          // Filter for AM mode (fs=16 ksps)
          if (filterMode==1 && decimator_factor==1){ 
 
-            newSample = AM1Filter_get(&flt);
-  
-            outSample = newSample + ADC_BIAS +ADC_BIAS_SHIFT;
             AM1Filter_put(&flt, newSample);
+            outSample = AM1Filter_get(&flt);
          }
 
          // Filter for SSB (fs=8 ksps)
          if (filterMode==2 && decimator_factor==2){ 
 
-            newSample = SSB1Filter_get(&flt0);
-  
-            outSample = newSample + ADC_BIAS +ADC_BIAS_SHIFT;
             SSB1Filter_put(&flt0, newSample);
+            outSample = SSB1Filter_get(&flt0);
          }
 
          // Filter for CW (fs=8 ksps)
          if (filterMode==3 && decimator_factor==2){ 
-
-            newSample = CW1Filter_get(&flt1);
-  
-            outSample = newSample + ADC_BIAS +ADC_BIAS_SHIFT;
+          
             CW1Filter_put(&flt1, newSample);
+            outSample = CW1Filter_get(&flt1);
         }
      
     };
