@@ -99,7 +99,7 @@ void initAudioGain(void){
   // to drive loud a 4 to 8ohm 3W speaker
   // to allow this, the MAX amplifier need a Power supply
   // of 5V (1,5 A)  
-  gainAudio = 25;
+  gainAudio = 8;
  }
   
 }
@@ -133,7 +133,7 @@ void audioIO_loop(void)
       }else{
         gpio_put(LED_PIN, 0);
       }
-
+    newSample = newSample*gainAudio;
 
      // Pre Filter for Decimator Anti Aliasing
      // a decimator factor by 2 need a 8kHz pre filter
@@ -194,11 +194,10 @@ void audioIO_loop(void)
      
     };
    // int16_t outSample2=outSample*25;
-   int16_t outSample2=outSample*gainAudio;
     
     // write the same sample twice, once for left and once for the right channel
-    i2s.write(outSample2);
-    i2s.write(outSample2);
+    i2s.write(outSample);
+    i2s.write(outSample);
 
   };
  
