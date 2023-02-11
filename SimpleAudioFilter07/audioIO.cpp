@@ -115,12 +115,6 @@ void audioIO_loop(void)
   int  nn= micros();
 #endif  
   
-    // Check decimator for filtermode:
-    // 0: as passthrough - no decimation
-    // 1,2: DNR + DNF    - noise reduction AVERANGE NR + LMS
-    // 3 for AM & SSB    - decimate by factor 1
-    // 3 for SSB         - decimate by factor 1
-    // 4: for CW         - decimate by factor 4
    
 #ifdef DEBUG_SERIAL 
  //char buffer[40];
