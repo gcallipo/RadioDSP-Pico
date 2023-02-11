@@ -63,7 +63,7 @@ ADCInput adcIn(26);
 #define PIN_BUTTON_AUDIO_GAIN 11
 
 // Over range led
-#define LED_PIN 12
+#define LED_PIN 25
 
 // define the maximum safe signal in input
 #define OVER_RANGE 150 
