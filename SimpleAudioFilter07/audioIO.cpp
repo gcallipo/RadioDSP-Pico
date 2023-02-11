@@ -108,7 +108,6 @@ void initAudioGain(void){
 void audioIO_loop(void)
 { 
   int16_t newSample=0;
-  int16_t gain=0;
 
   // For debug only
 #ifdef DEBUG_SERIAL  
@@ -161,35 +160,29 @@ void audioIO_loop(void)
 
          // Filter for AM mode (fs=16 ksps)
          if (filterMode==1 && decimator_factor==1){ 
-            // apply a small gain to compensate the filter action
-            gain = 2;
 
-            AM1Filter_put(&flt, newSample * gain);
             newSample = AM1Filter_get(&flt);
   
             outSample = newSample + ADC_BIAS +ADC_BIAS_SHIFT;
+            AM1Filter_put(&flt, newSample);
          }
 
          // Filter for SSB (fs=8 ksps)
          if (filterMode==2 && decimator_factor==2){ 
-            // apply a small gain to compensate the filter action
-            gain = 2;
 
-            SSB1Filter_put(&flt0, newSample * gain);
             newSample = SSB1Filter_get(&flt0);
   
             outSample = newSample + ADC_BIAS +ADC_BIAS_SHIFT;
+            SSB1Filter_put(&flt0, newSample);
          }
 
          // Filter for CW (fs=8 ksps)
          if (filterMode==3 && decimator_factor==2){ 
-            // apply a small gain to compensate the filter action
-            gain = 2;
 
-            CW1Filter_put(&flt1, newSample * gain);
             newSample = CW1Filter_get(&flt1);
   
             outSample = newSample + ADC_BIAS +ADC_BIAS_SHIFT;
+            CW1Filter_put(&flt1, newSample);
         }
      
     };
