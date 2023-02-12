@@ -62,11 +62,23 @@ ADCInput adcIn(26);
 // control to se the audio gain
 #define PIN_BUTTON_AUDIO_GAIN 11
 
-// Over range led
-#define LED_PIN 25
+// Over range onboard led
+// #define LED_PIN 25
+// Over range external led
+#define LED_PIN 12
 
 // define the maximum safe signal in input
-#define OVER_RANGE 2000
+// the led blink at 1/10 of maximum input level
+// this assures no distorsion or overload.
+// the 12 bit range ADC is -2048 to +2047 (+- 1.5 V, 3V pp)
+// The over range bling at about 150 mV of input peak signal
+// (300 mV pp) this is a good safe guard for 
+// the Pico ADC.
+#define OVER_RANGE 200
+
+// define min and max gain for output amplification
+#define MIN_GAIN   2   // suitable for headphone
+#define MAX_GAIN   30  // suitable for speaker
 
 // globals
 volatile uint8_t     decimator_ct = 0;
@@ -80,11 +92,10 @@ AVGFilter     flt2;   // AVG  filter
 Dec8KFilter   fltDec;
 
 int           passInput = 0;
-
-uint8_t filterMode = 0;
-uint8_t nrMode = 0;
-int16_t outSample = 0;
-int8_t gainAudio = 1;
+uint8_t       filterMode = 0;
+uint8_t       nrMode = 0;
+int16_t       outSample = 0;
+int8_t        gainAudio = MIN_GAIN;
 
 // Check if need to boost the audio
 // For safe reasons the value will be
@@ -92,14 +103,14 @@ int8_t gainAudio = 1;
 void initAudioGain(void) {
 
   // set the default audioGain for headphones
-  gainAudio = 1;
+  gainAudio = MIN_GAIN;
   if (digitalRead(PIN_BUTTON_AUDIO_GAIN) == LOW) {
     // if the pin is connected to GND,
     // the audio gain will be set to 25, suitable
     // to drive loud a 4 to 8ohm 3W speaker
     // to allow this, the MAX amplifier need a Power supply
     // of 5V (1,5 A)
-    gainAudio = 8;
+    gainAudio = MAX_GAIN;
   }
 
 }
@@ -180,7 +191,6 @@ void audioIO_loop(void)
       }
 
     };
-    // int16_t outSample2=outSample*25;
 
     // write the same sample twice, once for left and once for the right channel
     i2s.write(outSample);
