@@ -89,12 +89,14 @@ SSB1Filter    flt0;   // AM/SSB filter
 AM1Filter     flt;    // SSB filter
 CW1Filter     flt1;   // CW  filter
 AVGFilter     flt2;   // AVG  filter
-Dec8KFilter   fltDec;
+Dec8KFilter   fltDec1;
+Dec8KFilter   fltDec2;
 
 int           passInput = 0;
 uint8_t       filterMode = 0;
 uint8_t       nrMode = 0;
 int16_t       outSample = 0;
+int16_t       outSample_8k = 0;
 int8_t        gainAudio = MIN_GAIN;
 
 // Check if need to boost the audio
@@ -148,8 +150,8 @@ void audioIO_loop(void)
     // Pre Filter for Decimator Anti Aliasing
     // a decimator factor by 2 need a 8kHz pre filter
     if (decimator_factor == 2) {
-      Dec8KFilter_put(&fltDec, newSample);
-      newSample = Dec8KFilter_get(&fltDec);
+      Dec8KFilter_put(&fltDec1, newSample);
+      newSample = Dec8KFilter_get(&fltDec1);
     }
 
     // apply the NR.
@@ -180,17 +182,24 @@ void audioIO_loop(void)
       if (filterMode == 2 && decimator_factor == 2) {
 
         SSB1Filter_put(&flt0, newSample);
-        outSample = SSB1Filter_get(&flt0);
+        outSample_8k = SSB1Filter_get(&flt0);
       }
 
       // Filter for CW (fs=8 ksps)
       if (filterMode == 3 && decimator_factor == 2) {
 
         CW1Filter_put(&flt1, newSample);
-        outSample = CW1Filter_get(&flt1);
+        outSample_8k = CW1Filter_get(&flt1);
       }
 
     };
+
+    // Post Filter for Interpolation Anti Aliasing
+    // a decimator factor by 2 need a 8kHz pre filter
+    if (decimator_factor == 2) {
+      Dec8KFilter_put(&fltDec2, outSample_8k);
+      outSample = Dec8KFilter_get(&fltDec2);
+    }
 
     // write the same sample twice, once for left and once for the right channel
     i2s.write(outSample);
@@ -269,7 +278,8 @@ void core1_commands_check() {
 // general setup
 void audioIO_setup() {
 
-  Dec8KFilter_init(&fltDec);
+  Dec8KFilter_init(&fltDec1);
+  Dec8KFilter_init(&fltDec2);
   SSB1Filter_init(&flt0);
   AM1Filter_init(&flt);
   CW1Filter_init(&flt1);
