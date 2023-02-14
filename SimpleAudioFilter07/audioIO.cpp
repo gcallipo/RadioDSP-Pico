@@ -189,7 +189,7 @@ void audioIO_loop(void)
       if (filterMode == 3 && decimator_factor == 2) {
 
         CW1Filter_put(&flt1, newSample);
-        outSample_8k = CW1Filter_get(&flt1);
+        outSample_8k = CW1Filter_get(&flt1)*2;
       }
 
     };
@@ -198,8 +198,8 @@ void audioIO_loop(void)
     // a decimator factor by 2 need a 8kHz pre filter
     if (decimator_factor == 2) {
       Dec8KFilter_put(&fltDec2, outSample_8k);
-      outSample = Dec8KFilter_get(&fltDec2);
-    }
+      outSample = Dec8KFilter_get(&fltDec2)*2;
+    } 
 
     // write the same sample twice, once for left and once for the right channel
     i2s.write(outSample);
