@@ -98,6 +98,7 @@ uint8_t       nrMode = 0;
 int16_t       outSample = 0;
 int16_t       outSample_8k = 0;
 int8_t        gainAudio = MIN_GAIN;
+int8_t        gainFilter = 1;
 
 // Check if need to boost the audio
 // For safe reasons the value will be
@@ -155,10 +156,8 @@ void audioIO_loop(void)
     }
 
     // apply the NR.
-    if (nrMode >= 0) {
-      AVGFilter_put(&flt2, newSample);
-      newSample = AVGFilter_get(&flt2);
-    }
+    AVGFilter_put(&flt2, newSample);
+    newSample = AVGFilter_get(&flt2);
 
     // Main Filter Banks
     /// AUDIO PROCESSING WITH FILTERING AND DECIMATIN BLOCK
@@ -189,7 +188,7 @@ void audioIO_loop(void)
       if (filterMode == 3 && decimator_factor == 2) {
 
         CW1Filter_put(&flt1, newSample);
-        outSample_8k = CW1Filter_get(&flt1)*2;
+        outSample_8k = CW1Filter_get(&flt1);
       }
 
     };
@@ -198,12 +197,14 @@ void audioIO_loop(void)
     // a decimator factor by 2 need a 8kHz pre filter
     if (decimator_factor == 2) {
       Dec8KFilter_put(&fltDec2, outSample_8k);
-      outSample = Dec8KFilter_get(&fltDec2)*2;
+      outSample = Dec8KFilter_get(&fltDec2);
     } 
 
+    int16_t  outSample2= outSample * gainFilter;
+
     // write the same sample twice, once for left and once for the right channel
-    i2s.write(outSample);
-    i2s.write(outSample);
+    i2s.write(outSample2);
+    i2s.write(outSample2);
 
   };
 
@@ -232,14 +233,22 @@ void core1_commands_check() {
           filterMode++;
 
         // Active the filter stage
-        if (filterMode == 0)
+        if (filterMode == 0){
           decimator_factor = 1;
-        else if (filterMode == 1)
+          gainFilter=1;
+        }
+        else if (filterMode == 1){
           decimator_factor = 1;
-        else if (filterMode == 2)
+          gainFilter=2;
+        }
+        else if (filterMode == 2){
           decimator_factor = 2;
-        else if (filterMode == 3)
+          gainFilter=5;
+        }
+        else if (filterMode == 3){
           decimator_factor = 2;
+          gainFilter=10;
+        }
       }
     }
 
