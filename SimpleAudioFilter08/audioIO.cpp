@@ -29,6 +29,8 @@
 #include "Arduino.h"
 #include "audioIO.h"
 
+#include "cwNote.h"
+
 #include "SSB1Filter.h"
 #include "AVGFilter.h"
 #include "Dec8KFilter.h"
@@ -74,8 +76,8 @@ ADCInput adcIn(26);
 #define OVER_RANGE 200
 
 // define min and max gain for output amplification
-#define MIN_GAIN   2   // suitable for headphone
-#define MAX_GAIN   30  // suitable for speaker
+#define MIN_GAIN   30   // min gain sensitivity
+#define MAX_GAIN   60  // max gain sensitivity
 
 // globals
 volatile uint8_t     decimator_ct = 0;
@@ -95,20 +97,19 @@ int16_t       outSample_8k = 0;
 int8_t        gainAudio = MIN_GAIN;
 int8_t        gainFilter = 1;
 
+uint8_t       audioPlay = 1;
+
 // Check if need to boost the audio
 // For safe reasons the value will be
 // only at startup.
 void initAudioGain(void) {
 
   // set the default audioGain for headphones
-  gainAudio = MIN_GAIN;
+  gainAudio = MAX_GAIN;
   if (digitalRead(PIN_BUTTON_AUDIO_GAIN) == LOW) {
     // if the pin is connected to GND,
-    // the audio gain will be set to 25, suitable
-    // to drive loud a 4 to 8ohm 3W speaker
-    // to allow this, the MAX amplifier need a Power supply
-    // of 5V (1,5 A)
-    gainAudio = MAX_GAIN;
+    // the audio gain will be decreased
+    gainAudio = MIN_GAIN;
   }
 
 }
@@ -184,11 +185,43 @@ void audioIO_loop(void)
     int16_t  outSample2= outSample * gainFilter;
 
     // write the same sample twice, once for left and once for the right channel
-    i2s.write(outSample2);
-    i2s.write(outSample2);
+    if (audioPlay==1){
+      i2s.write(outSample2);
+      i2s.write(outSample2);
+    }
 
   };
 
+}
+
+
+void announceCmd(int iCmd){
+
+    setI2s(i2s);
+    audioPlay = 0;
+    if (iCmd==0){
+      playNN();
+    }
+    else if (iCmd==1){
+      playSW();
+    }
+    else if (iCmd==2){
+      playSN();
+    }
+    else if (iCmd==3){
+      playCW();
+    }
+    else if (iCmd==4){
+      playCN();
+    }
+    else if (iCmd==5){
+      playN1();
+    }
+    else if (iCmd==6){
+      playN2();
+    }
+
+    audioPlay = 1;
 }
 
 
@@ -217,26 +250,31 @@ void core1_commands_check() {
         if (filterMode == 0){
           decimator_factor = 1;
           gainFilter=1;
+          announceCmd(0);
         }
         else if (filterMode == 1){ // SSB W
           decimator_factor = 2;
           SSB1Filter_init(&flt0, ID_BANDPASS, W_HAMMING, 200, 3400, 8000.0);
           gainFilter=5;
+          announceCmd(1);
         }
         else if (filterMode == 2){ // SSB N
           decimator_factor = 2;
           SSB1Filter_init(&flt0, ID_BANDPASS, W_HAMMING, 300, 1800, 8000.0);
           gainFilter=5;
+          announceCmd(2);
         }
         else if (filterMode == 3){ // CW 600hz
           decimator_factor = 2;
           SSB1Filter_init(&flt0, ID_BANDPASS, W_BLACKMAN, 400, 1000, 8000.0);
-          gainFilter=6;
+          gainFilter=7;
+          announceCmd(3);
         }
         else if (filterMode == 4){  // CW 300hz
           decimator_factor = 2;
           SSB1Filter_init(&flt0, ID_BANDPASS, W_BLACKMAN, 450, 750, 8000.0);
-          gainFilter=8;
+          gainFilter=9;
+          announceCmd(4);
         }
       }
     }
@@ -249,21 +287,22 @@ void core1_commands_check() {
       if (val1 == LOW) {
 
         // Roll the filter selection
-        if (nrMode == 3)
+        if (nrMode == 2)
           nrMode = 0;
         else
           nrMode++;
 
         // Noise Reduction stage
         if (nrMode == 0) {
-          AVGFilter_init(&flt2, 2);
+          AVGFilter_init(&flt2, 4);
+           announceCmd(0);
         } else if (nrMode == 1) {
-          AVGFilter_init(&flt2, 5);
+          AVGFilter_init(&flt2, 8);
+          announceCmd(5);
         } else if (nrMode == 2) {
-          AVGFilter_init(&flt2, 10);
-        } else if (nrMode == 3) {
-          AVGFilter_init(&flt2, 15);
-        }
+          AVGFilter_init(&flt2, 12);
+          announceCmd(6);
+        } 
 
       }
     }
@@ -271,7 +310,6 @@ void core1_commands_check() {
     sleep_ms(500);
   }
 }
-
 
 // general setup
 void audioIO_setup() {

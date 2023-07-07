@@ -10,8 +10,8 @@
  * 0. Audio passthrough 
  * 1. DNR Average denoise Level 1
  * 2. DNR Average denoise Level 2
- * 3. DNR Average denoise Level 3
  * 
+ * With CW audio announce for mode and dnr change
  * 
  * Created: Feb 2023
  * Author: Giuseppe Callipo - IK8YFW
@@ -22,7 +22,7 @@
  * This program use filters built with the tFilter program
  * http://t-filter.engineerjs.com/
  * 
- * Last update: 11/02/2023
+ * Last update: 07/07/2023
  */
 
  
