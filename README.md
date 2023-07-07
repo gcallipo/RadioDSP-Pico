@@ -3,9 +3,11 @@ Audio Filter DSP for Shorthwave Receiver
 
 This Is a Digital Signal Processing to compute the audio of Shortwave Radio receiver. The project Is based on the Raspberry Pico pi board. The project implements some real time filters, show how to setup a simple real time processing dsp chain using the ADC and the I2S in/out for audio. 
 
-NEWS [18.02.2023] - The SimpleAudioFilter08 implements the dynamic filtering calculation, now it is possible to calculate on the fly 
+NEWS [07.07.2023] - The SimpleAudioFilter08 implements the dynamic filtering calculation, now it is possible to calculate on the fly 
 the kernel fir coefficient based on windowed sinc alghoritm. It is simple to add user defined filter, now I defined 4 filter
-SSB Wide (200-3400), SSB Narrow (300-1800), CW Wide (600 Hz) and CW Narrow (300 Hz).
+SSB Wide (200-3400), SSB Narrow (300-1800), CW Wide (600 Hz) and CW Narrow (300 Hz). The DNR with simple average filter works with two levels, and a cw announce was added to indicate the filter mode and dnr mode selected. 
+To avoid RFI interference I changed the output DAC with the PCM5102A, this dac is missed of internal Power amplifier, but it is noise free and
+enough for eadphone use. You can add a simple additional lm386 or similar power amplifier if you need mmore loud audio, but avoid cheap Class D amplifier when use the filter in both with an RTX. 
 All is work in progress.  
 
 [11.02.2023] - The new version SimpleAudioFilter07 use the ADCInput and I2S services by earlephilhower/arduino-pico plugin. 
