@@ -8,7 +8,11 @@
 extern "C" {
 #endif
  
-void setI2s(I2S i2sIn);
+// Change the setI2s by reference
+// to fix bug when compile on Arduino 2.x and plugin 3.6.0
+// Thanks David G4CJF for reporting the issue and solution.
+void setI2s(const I2S &i2sIn); 
+//void setI2s(I2S i2sIn);
 void playDith();
 void playDash();
 void playDelay();
