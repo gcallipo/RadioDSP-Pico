@@ -10,7 +10,7 @@ const int halfWavelength = (sampleRate / frequency); // half wavelength of squar
 
 I2S i2s_;
 
-void setI2s(I2S i2sIn){
+void setI2s(const I2S &i2sIn){
   i2s_ = i2sIn;
 }
 
