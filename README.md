@@ -26,13 +26,20 @@ CW    https://youtu.be/CpewdCyXoGU
 SSB1  https://youtu.be/-HOMVBYqSmQ
 SSB2  https://youtu.be/sMhqdDxAlq8
 
-[28.01.2023] - I'm starting new experimental filter (SimpleAudioFilter06) using ADCInput and I2S services by earlephilhower/arduino-pico plugin. All is work in progress, but the firsts results are really good.
+[30.04.2024] Other users Videos:
+Thanks to Antonio  Tafuto IW0FCI (ex. IW8ASM) for the video of his great built:
+
+ https://www.youtube.com/watch?v=aX2tm2u037I 
+
+He test the filter with and ICOM ic7300,  we can listen the various filter settings.
 
 ****************************************************************************************************
 OLD VERSIONS.  
 There are some old version available that implements similar processing but with some structural differences
 and still available for educational pourposes
 SimpleAudioFilter02,SimpleAudioFilter02, SimpleAudioFilter06 
+
+Note: starting from the (SimpleAudioFilter06) we use the ADCInput and I2S services by earlephilhower/arduino-pico plugin. All is work in progress, but the firsts results are really good.
 
 NOTE: The project was build with Arduino IDE v. 1.8.19 with the earlephilhower/arduino-pico plugin.
 
