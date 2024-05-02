@@ -42,9 +42,11 @@ SimpleAudioFilter02,SimpleAudioFilter02, SimpleAudioFilter06
 Note: starting from the (SimpleAudioFilter06) we use the ADCInput and I2S services by earlephilhower/arduino-pico plugin. 
 
 All is work in progress, but the firsts results are really good.
+****************************************************************************************************
+
 
 NOTE: The project was build with Arduino IDE v. 1.8.19 and v. 2.x.x with the earlephilhower/arduino-pico plugin.
-
-****************************************************************************************************
+      The pre-compiled versione is related to the latest versione SimpleAudioFilter8.
+      
 02 May 2024 - Giuseppe Callipo IK8YFW
 
