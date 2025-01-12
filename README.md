@@ -35,6 +35,7 @@ A: The previous Noise reduction is very simple and is based on a Median Filter w
 Some video that show the Filter connected to an FT 817 and driven an external speaker:
 
 Video 1: https://youtu.be/EvLYVzMn99M?si=gbbvi2po9-flEtfQ
+
 Video 2:
 
 ----------------------------------------------------------------------------------------------
