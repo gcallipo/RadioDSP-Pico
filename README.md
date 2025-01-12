@@ -4,7 +4,7 @@ Audio Filter DSP for Shorthwave Receiver
 This Is a Digital Signal Processing to compute the audio of Shortwave Radio receiver. The project Is based on the Raspberry Pico pi board. The project implements some real time filters, show how to setup a simple real time processing dsp chain using the ADC and the I2S in/out for audio. 
 Two versions are available at the moment:  SimpleAudioFilter08 works with Pico Pi1 and Pico Pi2 processors, SimpeAudioFilter09 works only with Pico Pi2.
 
-NEWS [12.01.2025] - RELEASE of a new version of the firmware that implements Digital Noise Reduction LMS with good results. 
+NEWS [12.01.2025] - RELEASE SimpleAudioFilter09 : a new version of the firmware that implements Digital Noise Reduction LMS with good results. 
 ATTENTION: The new firmware works with the same HW circuit but requires a RaspBerry Pico Pi 2 module without other circuit modifications,
 therefore, if you have built the filter, and want to use this new version you will have to change only the Raspberry Pico module 
 with the Pico 2 and load the SimpleAudioFilter09 Firmware.
@@ -15,11 +15,13 @@ Q: Does SimpleAudioFilter09 firmware work with the Raspberry Pico Pi 1?
 
 A: No, a Rasberry Pico Pi 2 module is required.
 
+
 Q: If I'm not interested in Noise Reduction, is it necessary to upgrade?
 
 A: No, because the filters remain unchanged.
 
-Q: What is the difference between the old Noise Reduction and the new one?
+
+Q: What is the difference between the old Noise Reduction (SimpleAudioFiler08) and the new one (SimpleAudioFiler09) ?
 
 A: The previous Noise reduction is very simple and is based on a Median Filter which 
    performs an arithmetic average on the acquired samples to smooth out any peaks 
