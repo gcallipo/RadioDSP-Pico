@@ -12,12 +12,15 @@ with the Pico 2 and load the SimpleAudioFilter09 Firmware.
 Question and Answer:
 
 Q: Does SimpleAudioFilter09 firmware work with the Raspberry Pico Pi 1?
+
 A: No, a Rasberry Pico Pi 2 module is required.
 
 Q: If I'm not interested in Noise Reduction, is it necessary to upgrade?
+
 A: No, because the filters remain unchanged.
 
 Q: What is the difference between the old Noise Reduction and the new one?
+
 A: The previous Noise reduction is very simple and is based on a Median Filter which 
    performs an arithmetic average on the acquired samples to smooth out any peaks 
    on the acquired signal and the audio effect is modest.
