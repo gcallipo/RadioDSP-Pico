@@ -32,7 +32,7 @@ A: The previous Noise reduction is very simple and is based on a Median Filter w
    significant. It is one of the most used algorithms on commercial transceivers.
 
 
-Some video that show the Filter connected to an FT 817 and driven an external speaker:
+Some video that show in action the new Noise Reduction, the Filter was connected to an FT 817 and driven an external speaker:
 
 Video 1: https://youtu.be/EvLYVzMn99M?si=gbbvi2po9-flEtfQ
 
