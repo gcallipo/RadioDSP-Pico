@@ -84,5 +84,5 @@ All is work in progress, but the firsts results are really good.
 NOTE: The project was build with Arduino IDE v. 1.8.19 and v. 2.x.x with the earlephilhower/arduino-pico plugin.
       The pre-compiled versione is related to the latest version SimpleAudioFilter8.
       
-02 May 2024 - Giuseppe Callipo IK8YFW
+12 Jan 2025 - Giuseppe Callipo IK8YFW
 
