@@ -72,7 +72,7 @@ He test the filter with an ICOM ic7300,  we can listen the various filter settin
 OLD VERSIONS.  
 There are some old version available that implements similar processing but with some structural differences
 and still available for educational pourposes
-SimpleAudioFilter02,SimpleAudioFilter02, SimpleAudioFilter06 
+SimpleAudioFilter02,SimpleAudioFilter02, SimpleAudioFilter06, SimpleAudioFiler07 
 
 Note: starting from the (SimpleAudioFilter06) we use the ADCInput and I2S services by earlephilhower/arduino-pico plugin. 
 
