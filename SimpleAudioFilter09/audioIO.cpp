@@ -23,7 +23,7 @@
  * This program use filters built with the tFilter program
  * http://t-filter.engineerjs.com/
  * 
- * Last update: 03/01/2025
+ * Last update: 19/01/2025
  * NOTE: This version does not works with Raspberry Pico Pi but
  *       need the new module Raspberry Pico Pi2 based on CortexM33 Architecture.
  */
@@ -76,8 +76,8 @@ ADCInput adcIn(26);
 #define OVER_RANGE 200
 
 // define min and max gain for output amplification
-#define MIN_GAIN   40   // min gain sensitivity
-#define MAX_GAIN   60  // max gain sensitivity
+#define MIN_GAIN   20   // min gain sensitivity
+#define MAX_GAIN   35   // max gain sensitivity (default)
 
 // globals
 volatile int16_t     avg, sum, out_sample = 0;
@@ -245,6 +245,8 @@ void ALSfilter() {
 }
 // End of ALS *******************************************************************************
 
+int newSampleCheckOver =0;
+
 void audioIO_loop(void)
 {
   int16_t newSample = 0, sum =0;
@@ -253,15 +255,8 @@ void audioIO_loop(void)
 
     // Accumuate BUFFER_SIZE x MULT samples
     while (adcIn.available() >= 0 && k < BUFFER_SIZE) {
-      newSample = adcIn.read();
-      newSample = newSample - ADC_BIAS - ADC_BIAS_SHIFT;
-
-      /* Blink the builtin LED if the input signal go over range */
-      if (newSample > OVER_RANGE) {
-        gpio_put(LED_PIN, 1);
-      } else {
-        gpio_put(LED_PIN, 0);
-      }
+      newSample = adcIn.read()- ADC_BIAS - ADC_BIAS_SHIFT;
+      newSampleCheckOver = newSample;
 
        // Filter for SSB (fs=8 ksps)
        if (filterMode >0) {
@@ -410,8 +405,8 @@ void core1_commands_check() {
           announceCmd(0);
         } else if (nrMode == 1) {
           doLMS = true;
-          //setLMSParameters(0.05f, 0.995f);
-          setLMSParameters(0.20, 0.89f); 
+          setLMSParameters(0.05f, 0.92f);
+          //setLMSParameters(0.20, 0.89f); 
           announceCmd(5);
         } else if (nrMode == 2) {
           doLMS = true;
@@ -422,7 +417,14 @@ void core1_commands_check() {
       }
     }
 
-    sleep_ms(500);
+      /* Blink the builtin LED if the input signal go over range */
+      if (newSampleCheckOver > OVER_RANGE) {
+        gpio_put(LED_PIN, 1);
+      } else {
+        gpio_put(LED_PIN, 0);
+      }
+
+    sleep_ms(50);
   }
 }
 
@@ -448,7 +450,7 @@ void audioIO_setup() {
     while (1); // do nothing
   }
 
-  adcIn.setBuffers(4, 16);
+  adcIn.setBuffers(4, BUFFER_SIZE);
 
   if (!adcIn.begin(sampleRate)) {
     //Serial.println("Failed to initialize ADCInput!");
@@ -469,8 +471,7 @@ void audioIO_setup() {
 
   // Analize LMS denoise 
   initializeLMS(DENOISE, 128, 8);
-  //initializeLMS(DENOISE, 128, 4);
-  setLMSParameters(0.20, 0.89f); 
+  setLMSParameters(0.05f, 0.999f); 
   doLMS=false;
 
   // start DSP processor
