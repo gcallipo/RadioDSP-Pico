@@ -38,6 +38,8 @@ Video 1: https://youtu.be/EvLYVzMn99M?si=gbbvi2po9-flEtfQ
 
 Video 2:
 
+
+FIX [19.01.2025] Fixed the wrong ADC BUFFER SIZE, was 16, now 128.
 ----------------------------------------------------------------------------------------------
 FIX [24.11.2023] - Change the setI2s by reference, to fix bug when compile on Arduino 2.x and plugin 3.6.0. Thanks David G4CJF for reporting the issue and solution.
 
