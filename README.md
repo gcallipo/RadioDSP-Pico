@@ -38,9 +38,10 @@ Video 1: https://youtu.be/EvLYVzMn99M?si=gbbvi2po9-flEtfQ
 
 
 FIX [05.03.2025] Add average filter to compensate adc noise, decrease the gain default input.
+----------------------------------------------------------------------------------------------
 
 FIX [19.01.2025] Fixed the wrong ADC BUFFER SIZE, was 16, now 128.
-----------------------------------------------------------------------------------------------
+
 FIX [24.11.2023] - Change the setI2s by reference, to fix bug when compile on Arduino 2.x and plugin 3.6.0. Thanks David G4CJF for reporting the issue and solution.
 
 NEWS [13.08.2023] - Added new schematic board. For filter, the mono switch must be set to MONO and only one input autio source must be apply.
