@@ -36,8 +36,8 @@ Some video that show in action the new Noise Reduction, the Filter was connected
 
 Video 1: https://youtu.be/EvLYVzMn99M?si=gbbvi2po9-flEtfQ
 
-Video 2:
 
+FIX [05.03.2025] Add average filter to compensate adc noise, decrease the gain default input.
 
 FIX [19.01.2025] Fixed the wrong ADC BUFFER SIZE, was 16, now 128.
 ----------------------------------------------------------------------------------------------
