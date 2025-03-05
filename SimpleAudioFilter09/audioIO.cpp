@@ -32,7 +32,7 @@
 #include "audioIO.h"
 
 #include "cwNote.h"
-
+#include "AVGFilter.h"
 #include "SSB1Filter.h"
 
 #include "pico/multicore.h"
@@ -73,15 +73,17 @@ ADCInput adcIn(26);
 // The over range bling at about 150 mV of input peak signal
 // (300 mV pp) this is a good safe guard for 
 // the Pico ADC.
-#define OVER_RANGE 200
+#define OVER_RANGE 250
 
 // define min and max gain for output amplification
-#define MIN_GAIN   20   // min gain sensitivity
-#define MAX_GAIN   35   // max gain sensitivity (default)
+#define MIN_GAIN   10 //20   // min gain sensitivity
+#define MAX_GAIN   15 //35   // max gain sensitivity (default)
+#define ADC_MAX    4  // Max denoise adc
+#define ADC_MIN    3  // Min denoise adc
 
 // globals
 volatile int16_t     avg, sum, out_sample = 0;
-
+AVGFilter     flt2;   // AVG  filter
 SSB1Filter    flt0;   // CW/SSB filter
 
 int           passInput = 0;
@@ -258,6 +260,12 @@ void audioIO_loop(void)
       newSample = adcIn.read()- ADC_BIAS - ADC_BIAS_SHIFT;
       newSampleCheckOver = newSample;
 
+       // apply adc denoise.
+       if (filterMode<3 && doLMS==false){
+         AVGFilter_put(&flt2, newSample);
+         newSample = AVGFilter_get(&flt2);
+       }
+
        // Filter for SSB (fs=8 ksps)
        if (filterMode >0) {
           SSB1Filter_put(&flt0, newSample);
@@ -382,6 +390,15 @@ void core1_commands_check() {
           gainFilter=3;
           announceCmd(4);
         }
+
+        // Filter only for SSB filters  
+        if (filterMode == 0){
+                AVGFilter_init(&flt2, ADC_MAX);
+        }
+        else if (filterMode>0 && filterMode < 3){
+                AVGFilter_init(&flt2, ADC_MIN);
+        }
+      
       }
     }
 
@@ -415,6 +432,7 @@ void core1_commands_check() {
           announceCmd(6);
         } 
       }
+
     }
 
       /* Blink the builtin LED if the input signal go over range */
@@ -430,8 +448,9 @@ void core1_commands_check() {
 
 // general setup
 void audioIO_setup() {
-
-  SSB1Filter_init(&flt0, ID_BANDPASS, W_BLACKMAN, 200.0, 3400.0, 8000.0);
+  
+  SSB1Filter_init(&flt0, ID_BANDPASS, W_BLACKMAN, 200.0, 3400.0, 12000.0);
+  AVGFilter_init(&flt2, ADC_MAX);
 
   gpio_init_mask(1 << LED_PIN);
   gpio_set_dir(LED_PIN, GPIO_OUT);
