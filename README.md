@@ -9,7 +9,11 @@ ATTENTION: The new firmware works with the same HW circuit but requires a RaspBe
 therefore, if you have built the filter, and want to use this new version you will have to change only the Raspberry Pico module 
 with the Pico 2 and load the SimpleAudioFilter09 Firmware.
 
->> ATTENTION PLEASE: The project works correctly with Arduino IDE 2.3.x but currently requires the earlephilhower/arduino-pico plugin version 4.3.1, newer versions of the plugin are currently not supported. Thanks for your understanding.
+>> ATTENTION PLEASE: The project works correctly with Arduino IDE 2.3.x but currently requires the earlephilhower/arduino-pico plugin version  4.5.1, newer versions of the plugin are currently not supported. Thanks for your understanding.
+>>
+>> 2025.05.05 - The issue on arduino pico plugin was fixed and will be available on the next Release ( 4.5.4 or more )
+
+
 
 Question and Answer:
 
